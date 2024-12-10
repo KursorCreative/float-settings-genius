@@ -4,6 +4,10 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { WeightConverter } from './WeightConverter';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info, RotateCcw } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ShockSettings {
   airPressure: number;
@@ -19,6 +23,7 @@ export const ShockSetupForm = () => {
   const [ridingStyle, setRidingStyle] = useState('trail');
   const [bikeTravel, setBikeTravel] = useState('150');
   const [preferredFeel, setPreferredFeel] = useState('balanced');
+  const { toast } = useToast();
 
   const calculateSettings = (): ShockSettings => {
     const weightInKg = unit === 'kg' ? weight : weight / 2.20462;
@@ -55,10 +60,36 @@ export const ShockSetupForm = () => {
     };
   };
 
+  const handleReset = () => {
+    setWeight(70);
+    setUnit('kg');
+    setRidingStyle('trail');
+    setBikeTravel('150');
+    setPreferredFeel('balanced');
+    toast({
+      title: "Settings Reset",
+      description: "All settings have been reset to default values.",
+    });
+  };
+
   const settings = calculateSettings();
 
   return (
-    <Card className="p-6 space-y-6">
+    <Card className="p-6 space-y-6 animate-fade-in">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Shock Settings</h2>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleReset}
+          className="flex items-center gap-2"
+          aria-label="Reset all settings to default values"
+        >
+          <RotateCcw className="h-4 w-4" />
+          Reset
+        </Button>
+      </div>
+
       <WeightConverter
         weight={weight}
         unit={unit}
@@ -67,11 +98,24 @@ export const ShockSetupForm = () => {
       />
 
       <div className="space-y-2">
-        <Label>Riding Style</Label>
+        <div className="flex items-center gap-2">
+          <Label htmlFor="riding-style">Riding Style</Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-4 w-4 text-muted-foreground" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Choose your primary riding style for optimal settings</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <RadioGroup
           defaultValue="trail"
           onValueChange={setRidingStyle}
           className="flex flex-wrap gap-4"
+          aria-label="Select your riding style"
         >
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="xc" id="xc" />
@@ -93,9 +137,25 @@ export const ShockSetupForm = () => {
       </div>
 
       <div className="space-y-2">
-        <Label>Rear Travel (mm)</Label>
-        <Select defaultValue="150" onValueChange={setBikeTravel}>
-          <SelectTrigger>
+        <div className="flex items-center gap-2">
+          <Label htmlFor="bike-travel">Rear Travel (mm)</Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-4 w-4 text-muted-foreground" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Your bike's rear suspension travel in millimeters</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+        <Select 
+          defaultValue="150" 
+          onValueChange={setBikeTravel}
+          aria-label="Select rear suspension travel"
+        >
+          <SelectTrigger id="bike-travel">
             <SelectValue placeholder="Select travel" />
           </SelectTrigger>
           <SelectContent>
@@ -109,11 +169,24 @@ export const ShockSetupForm = () => {
       </div>
 
       <div className="space-y-2">
-        <Label>Preferred Feel</Label>
+        <div className="flex items-center gap-2">
+          <Label>Preferred Feel</Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-4 w-4 text-muted-foreground" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Choose how you want your suspension to feel</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <RadioGroup
           defaultValue="balanced"
           onValueChange={setPreferredFeel}
           className="flex flex-wrap gap-4"
+          aria-label="Select your preferred suspension feel"
         >
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="soft" id="soft" />
@@ -130,27 +203,27 @@ export const ShockSetupForm = () => {
         </RadioGroup>
       </div>
 
-      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+      <div className="mt-6 p-4 bg-gray-50 rounded-lg dark:bg-gray-800 transition-all">
         <h3 className="text-lg font-semibold mb-4">Recommended Settings</h3>
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm text-gray-600">Air Pressure</p>
+          <div className="p-3 bg-white dark:bg-gray-700 rounded-lg transition-all hover:shadow-md">
+            <p className="text-sm text-gray-600 dark:text-gray-300">Air Pressure</p>
             <p className="text-xl font-bold text-fox-orange">{settings.airPressure} PSI</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-600">HSR</p>
+          <div className="p-3 bg-white dark:bg-gray-700 rounded-lg transition-all hover:shadow-md">
+            <p className="text-sm text-gray-600 dark:text-gray-300">HSR</p>
             <p className="text-xl font-bold">{settings.hsr} clicks</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-600">LSR</p>
+          <div className="p-3 bg-white dark:bg-gray-700 rounded-lg transition-all hover:shadow-md">
+            <p className="text-sm text-gray-600 dark:text-gray-300">LSR</p>
             <p className="text-xl font-bold">{settings.lsr} clicks</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-600">HSC</p>
+          <div className="p-3 bg-white dark:bg-gray-700 rounded-lg transition-all hover:shadow-md">
+            <p className="text-sm text-gray-600 dark:text-gray-300">HSC</p>
             <p className="text-xl font-bold">{settings.hsc} clicks</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-600">LSC</p>
+          <div className="p-3 bg-white dark:bg-gray-700 rounded-lg transition-all hover:shadow-md">
+            <p className="text-sm text-gray-600 dark:text-gray-300">LSC</p>
             <p className="text-xl font-bold">{settings.lsc} clicks</p>
           </div>
         </div>
