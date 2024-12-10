@@ -13,7 +13,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "./ui/tooltip";
 
 interface ShockFormFieldsProps {
   ridingStyle: string;
@@ -48,57 +48,57 @@ export const ShockFormFields = ({
     <div className="space-y-6">
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
+          <Label className="text-base font-medium">Trek EXE Model</Label>
+          <Select value={bikeType} onValueChange={setBikeType}>
+            <SelectTrigger className="w-full h-11 transition-colors hover:border-fox-orange">
+              <SelectValue placeholder="Select EXE model" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="exe-9.9">EXE 9.9 XX1 AXS</SelectItem>
+              <SelectItem value="exe-9.8">EXE 9.8 XT</SelectItem>
+              <SelectItem value="exe-9.7">EXE 9.7 GX AXS</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
           <Label className="text-base font-medium">Riding Style</Label>
           <Select value={ridingStyle} onValueChange={setRidingStyle}>
             <SelectTrigger className="w-full h-11 transition-colors hover:border-fox-orange">
               <SelectValue placeholder="Select riding style" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="xc">Cross-Country (XC)</SelectItem>
               <SelectItem value="trail">Trail</SelectItem>
               <SelectItem value="flow">Flow Trails</SelectItem>
-              <SelectItem value="enduro">Enduro</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-base font-medium">Bike Type</Label>
-          <Select value={bikeType} onValueChange={setBikeType}>
-            <SelectTrigger className="w-full h-11 transition-colors hover:border-fox-orange">
-              <SelectValue placeholder="Select bike type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="full">Full Suspension</SelectItem>
-              <SelectItem value="hardtail">Hardtail</SelectItem>
+              <SelectItem value="technical">Technical Trails</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
       <div className="space-y-3">
-        <Label className="text-base font-medium">Rear Travel (mm)</Label>
+        <Label className="text-base font-medium">Rear Travel (140mm)</Label>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="pt-2">
                 <Slider
-                  value={[travel]}
-                  onValueChange={(value) => setTravel(value[0])}
-                  min={100}
-                  max={200}
+                  value={[140]}
+                  disabled={true}
+                  min={140}
+                  max={140}
                   step={10}
-                  className="[&>[role=slider]]:bg-fox-orange [&>[role=slider]]:border-fox-orange [&>.relative>.absolute]:bg-fox-orange"
+                  className="cursor-not-allowed [&>[role=slider]]:bg-fox-orange [&>[role=slider]]:border-fox-orange [&>.relative>.absolute]:bg-fox-orange"
                 />
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Adjust rear travel in millimeters</p>
+              <p>Trek EXE models have fixed 140mm rear travel</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
         <div className="text-right text-sm text-muted-foreground">
-          {travel}mm
+          140mm
         </div>
       </div>
 
@@ -141,6 +141,7 @@ export const ShockFormFields = ({
           <SelectContent>
             <SelectItem value="climbing">Climbing Efficiency</SelectItem>
             <SelectItem value="descending">Descending Performance</SelectItem>
+            <SelectItem value="balanced">Balanced Performance</SelectItem>
           </SelectContent>
         </Select>
       </div>
