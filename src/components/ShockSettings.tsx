@@ -21,6 +21,8 @@ interface ShockSettingsProps {
     forkLsr: number;
     forkHsc: number;
     forkLsc: number;
+    stackHeight: number;
+    headAngle: number;
   };
 }
 
@@ -127,6 +129,32 @@ export const ShockSettings = ({ settings }: ShockSettingsProps) => {
       </div>
       
       <div>
+        <h4 className="text-md font-medium mb-4">Geometry Changes</h4>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card className="p-4 transition-all hover:shadow-md">
+            <div className="flex items-start justify-between">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Stack Height</p>
+                <p className="text-2xl font-semibold text-fox-orange">
+                  {settings.stackHeight}mm
+                </p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-4 transition-all hover:shadow-md">
+            <div className="flex items-start justify-between">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Head Tube Angle</p>
+                <p className="text-2xl font-semibold text-fox-orange">
+                  {settings.headAngle.toFixed(1)}°
+                </p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
+
+      <div>
         <h4 className="text-md font-medium mb-4">Rear Shock Settings</h4>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {shockItems.map((item) => (
@@ -157,7 +185,7 @@ export const ShockSettings = ({ settings }: ShockSettingsProps) => {
           ))}
         </div>
       </div>
-
+      
       <div>
         <h4 className="text-md font-medium mb-4">Fox 36 Factory Fork Settings</h4>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -189,7 +217,7 @@ export const ShockSettings = ({ settings }: ShockSettingsProps) => {
           ))}
         </div>
       </div>
-
+      
       <div className="rounded-lg border border-border bg-card p-4">
         <p className="text-sm text-muted-foreground">
           💡 Pro tip: Start with these settings and adjust based on feel. For rocky terrain,
