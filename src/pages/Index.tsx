@@ -26,9 +26,12 @@ const Index = () => {
           <p>All recommendations are starting points. Fine-tune based on your feel and preferences.</p>
         </div>
 
-        <footer className="mt-16 text-center text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2">
-          <span>Developed by Matt Pirani</span>
-          <Bike className="inline-block w-5 h-5 text-fox-orange" />
+        <footer className="mt-16 text-center text-gray-500 dark:text-gray-400 flex flex-col items-center justify-center gap-1">
+          <div className="flex items-center gap-2">
+            <span>Developed by Matt Pirani</span>
+            <Bike className="inline-block w-5 h-5 text-fox-orange" />
+          </div>
+          <span className="text-sm">© 2024</span>
         </footer>
       </div>
     </div>
