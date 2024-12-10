@@ -9,6 +9,7 @@ import {
 } from "./ui/tooltip";
 import { BikeDetailsSection } from "./BikeDetailsSection";
 import { RidingPreferencesSection } from "./RidingPreferencesSection";
+import { ForkDetailsSection } from "./ForkDetailsSection";
 
 interface ShockFormFieldsProps {
   ridingStyle: string;
@@ -17,6 +18,8 @@ interface ShockFormFieldsProps {
   setBikeType: (value: string) => void;
   travel: number;
   setTravel: (value: number) => void;
+  forkTravel: string;
+  setForkTravel: (value: string) => void;
   preferredFeel: string;
   setPreferredFeel: (value: string) => void;
   trailCondition: string;
@@ -34,6 +37,8 @@ export const ShockFormFields = ({
   setBikeType,
   travel,
   setTravel,
+  forkTravel,
+  setForkTravel,
   preferredFeel,
   setPreferredFeel,
   trailCondition,
@@ -50,6 +55,11 @@ export const ShockFormFields = ({
         setBikeType={setBikeType}
         bikeSize={bikeSize}
         setBikeSize={setBikeSize}
+      />
+
+      <ForkDetailsSection
+        forkTravel={forkTravel}
+        setForkTravel={setForkTravel}
       />
 
       <RidingPreferencesSection
