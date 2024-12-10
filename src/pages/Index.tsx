@@ -14,7 +14,7 @@ const Index = () => {
             <Sparkles className="w-8 h-8 text-fox-blue animate-pulse" />
           </div>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Get personalized shock settings based on your riding style and preferences
+            Get personalised shock settings based on your riding style and preferences
           </p>
         </div>
         
