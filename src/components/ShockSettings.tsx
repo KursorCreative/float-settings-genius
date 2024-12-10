@@ -24,27 +24,27 @@ export const ShockSettings = ({ settings }: ShockSettingsProps) => {
     {
       label: "Air Pressure",
       value: `${settings.airPressure} PSI`,
-      tooltip: "Base air pressure for your weight and riding style",
+      tooltip: "Base air pressure for your weight and riding style. Use a shock pump to set pressure with the bike unweighted.",
     },
     {
       label: "High-Speed Rebound (HSR)",
       value: `${settings.hsr} clicks`,
-      tooltip: "Controls rebound damping at higher shaft speeds",
+      tooltip: "Controls rebound damping at higher shaft speeds. Adjust by turning the red knob on the top of the shock. Clockwise (looking down at the knob) to increase damping, counter-clockwise to decrease.",
     },
     {
       label: "Low-Speed Rebound (LSR)",
       value: `${settings.lsr} clicks`,
-      tooltip: "Controls rebound damping at lower shaft speeds",
+      tooltip: "Controls rebound damping at lower shaft speeds. Adjust using the inner red knob on the top of the shock. Clockwise (looking down at the knob) to increase damping, counter-clockwise to decrease.",
     },
     {
       label: "High-Speed Compression (HSC)",
       value: `${settings.hsc} clicks`,
-      tooltip: "Controls compression damping during big hits",
+      tooltip: "Controls compression damping during big hits. Adjust using the blue outer knob on the bottom of the shock. Clockwise (looking up at the knob) to increase damping, counter-clockwise to decrease.",
     },
     {
       label: "Low-Speed Compression (LSC)",
       value: `${settings.lsc} clicks`,
-      tooltip: "Controls compression damping during small bumps",
+      tooltip: "Controls compression damping during small bumps. Adjust using the blue inner knob on the bottom of the shock. Clockwise (looking up at the knob) to increase damping, counter-clockwise to decrease.",
     },
   ];
 
