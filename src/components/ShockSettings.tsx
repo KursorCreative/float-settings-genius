@@ -24,27 +24,46 @@ export const ShockSettings = ({ settings }: ShockSettingsProps) => {
     {
       label: "Air Pressure",
       value: `${settings.airPressure} PSI`,
-      tooltip: "Base air pressure for your weight and riding style. Use a shock pump to set pressure with the bike unweighted.",
+      tooltip: {
+        main: "Base air pressure for your weight and riding style.",
+        instruction: "Use a shock pump to set pressure with the bike unweighted."
+      },
     },
     {
       label: "High-Speed Rebound (HSR)",
       value: `${settings.hsr} clicks`,
-      tooltip: "Controls rebound damping at higher shaft speeds. Adjust by turning the red knob on the top of the shock. Clockwise (looking down at the knob) to increase damping, counter-clockwise to decrease.",
+      tooltip: {
+        main: "Controls rebound damping at higher shaft speeds.",
+        instruction: "Adjust using the red knob on top of shock:",
+        direction: "↻ Clockwise (looking down): Increase damping\n↺ Counter-clockwise: Decrease"
+      },
     },
     {
       label: "Low-Speed Rebound (LSR)",
       value: `${settings.lsr} clicks`,
-      tooltip: "Controls rebound damping at lower shaft speeds. Adjust using the inner red knob on the top of the shock. Clockwise (looking down at the knob) to increase damping, counter-clockwise to decrease.",
+      tooltip: {
+        main: "Controls rebound damping at lower shaft speeds.",
+        instruction: "Adjust using the inner red knob on top:",
+        direction: "↻ Clockwise (looking down): Increase damping\n↺ Counter-clockwise: Decrease"
+      },
     },
     {
       label: "High-Speed Compression (HSC)",
       value: `${settings.hsc} clicks`,
-      tooltip: "Controls compression damping during big hits. Adjust using the blue outer knob on the bottom of the shock. Clockwise (looking up at the knob) to increase damping, counter-clockwise to decrease.",
+      tooltip: {
+        main: "Controls compression damping during big hits.",
+        instruction: "Adjust using the outer blue knob on bottom:",
+        direction: "↻ Clockwise (looking up): Increase damping\n↺ Counter-clockwise: Decrease"
+      },
     },
     {
       label: "Low-Speed Compression (LSC)",
       value: `${settings.lsc} clicks`,
-      tooltip: "Controls compression damping during small bumps. Adjust using the blue inner knob on the bottom of the shock. Clockwise (looking up at the knob) to increase damping, counter-clockwise to decrease.",
+      tooltip: {
+        main: "Controls compression damping during small bumps.",
+        instruction: "Adjust using the inner blue knob on bottom:",
+        direction: "↻ Clockwise (looking up): Increase damping\n↺ Counter-clockwise: Decrease"
+      },
     },
   ];
 
@@ -67,8 +86,12 @@ export const ShockSettings = ({ settings }: ShockSettingsProps) => {
                       <TooltipTrigger>
                         <InfoIcon className="h-4 w-4 text-muted-foreground" />
                       </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="text-sm">{item.tooltip}</p>
+                      <TooltipContent className="max-w-[300px] space-y-2 p-4">
+                        <p className="font-medium">{item.tooltip.main}</p>
+                        <p className="text-sm text-muted-foreground">{item.tooltip.instruction}</p>
+                        {item.tooltip.direction && (
+                          <p className="text-sm text-muted-foreground whitespace-pre-line">{item.tooltip.direction}</p>
+                        )}
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
