@@ -1,4 +1,5 @@
 import { ShockSetupForm } from "@/components/ShockSetupForm";
+import { Bike } from "lucide-react";
 
 const Index = () => {
   return (
@@ -18,6 +19,11 @@ const Index = () => {
         <div className="mt-8 text-center text-sm text-gray-500">
           <p>All recommendations are starting points. Fine-tune based on your feel and preferences.</p>
         </div>
+
+        <footer className="mt-16 text-center text-gray-500 flex items-center justify-center gap-2">
+          <span>Designed by Matt Pirani</span>
+          <Bike className="inline-block w-5 h-5" />
+        </footer>
       </div>
     </div>
   );
