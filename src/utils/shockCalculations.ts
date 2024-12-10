@@ -10,7 +10,8 @@ export const calculateShockSettings = (
   weight: number,
   unit: "kg" | "lbs",
   ridingStyle: string,
-  preferredFeel: string
+  preferredFeel: string,
+  frameSize: string
 ): ShockSettings => {
   // Convert weight to kg if needed
   const weightInKg = unit === "lbs" ? weight * 0.453592 : weight;
@@ -22,6 +23,26 @@ export const calculateShockSettings = (
   let lsr = 10; // Base LSR for Horst Link
   let hsc = 12; // Base HSC for Horst Link
   let lsc = 14; // Base LSC for Horst Link
+
+  // Adjust for frame size
+  switch (frameSize) {
+    case "XL":
+      // Larger frames need slightly slower rebound due to longer leverage
+      hsr += 1;
+      lsr += 1;
+      break;
+    case "L":
+      // Slight adjustment for large frames
+      hsr += 0.5;
+      lsr += 0.5;
+      break;
+    case "S":
+      // Smaller frames might need slightly faster rebound
+      hsr -= 0.5;
+      lsr -= 0.5;
+      break;
+    // Medium is default
+  }
 
   // Adjust for riding style
   switch (ridingStyle) {
@@ -61,9 +82,9 @@ export const calculateShockSettings = (
 
   return {
     airPressure: Math.round(airPressure),
-    hsr: Math.max(0, Math.min(hsr, 16)), // Ensure within 0-16 range
-    lsr: Math.max(0, Math.min(lsr, 16)),
-    hsc: Math.max(0, Math.min(hsc, 16)),
-    lsc: Math.max(0, Math.min(lsc, 16)),
+    hsr: Math.max(0, Math.min(Math.round(hsr), 16)), // Ensure within 0-16 range
+    lsr: Math.max(0, Math.min(Math.round(lsr), 16)),
+    hsc: Math.max(0, Math.min(Math.round(hsc), 16)),
+    lsc: Math.max(0, Math.min(Math.round(lsc), 16)),
   };
 };
