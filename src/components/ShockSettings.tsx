@@ -73,7 +73,7 @@ export const ShockSettings = ({ settings }: ShockSettingsProps) => {
                     </Tooltip>
                   </TooltipProvider>
                 </div>
-                <p className="text-2xl font-semibold text-fox-blue">{item.value}</p>
+                <p className="text-2xl font-semibold text-fox-orange">{item.value}</p>
               </div>
             </div>
           </Card>

@@ -1,24 +1,11 @@
 import React, { useState } from "react";
 import { WeightConverter } from "./WeightConverter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ShockSettings } from "./ShockSettings";
+import { ShockFormFields } from "./ShockFormFields";
+import { calculateShockSettings } from "@/utils/shockCalculations";
 
 export const ShockSetupForm = () => {
   const { toast } = useToast();
@@ -31,49 +18,7 @@ export const ShockSetupForm = () => {
   const [trailCondition, setTrailCondition] = useState("technical");
   const [priority, setPriority] = useState("descending");
 
-  const calculateSettings = () => {
-    // Convert weight to kg if needed
-    const weightInKg = unit === "lbs" ? weight * 0.453592 : weight;
-    
-    // Base calculations
-    let airPressure = weightInKg * 1.1; // Basic calculation - would need refinement
-    let hsr = 8;
-    let lsr = 10;
-    let hsc = 12;
-    let lsc = 14;
-
-    // Adjust for riding style
-    if (ridingStyle === "xc") {
-      airPressure *= 1.1;
-      hsr -= 2;
-      lsr -= 2;
-    } else if (ridingStyle === "enduro") {
-      airPressure *= 0.9;
-      hsc += 2;
-      lsc += 2;
-    }
-
-    // Adjust for preferred feel
-    if (preferredFeel === "soft") {
-      airPressure *= 0.95;
-      hsc -= 1;
-      lsc -= 1;
-    } else if (preferredFeel === "firm") {
-      airPressure *= 1.05;
-      hsc += 1;
-      lsc += 1;
-    }
-
-    return {
-      airPressure: Math.round(airPressure),
-      hsr,
-      lsr,
-      hsc,
-      lsc,
-    };
-  };
-
-  const settings = calculateSettings();
+  const settings = calculateShockSettings(weight, unit, ridingStyle, preferredFeel);
 
   const handleReset = () => {
     setWeight(70);
@@ -104,100 +49,20 @@ export const ShockSetupForm = () => {
           onUnitChange={setUnit}
         />
 
-        <div className="space-y-4">
-          <div>
-            <Label>Riding Style</Label>
-            <Select value={ridingStyle} onValueChange={setRidingStyle}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select riding style" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="xc">Cross-Country (XC)</SelectItem>
-                <SelectItem value="trail">Trail</SelectItem>
-                <SelectItem value="flow">Flow Trails</SelectItem>
-                <SelectItem value="enduro">Enduro</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label>Bike Type</Label>
-            <Select value={bikeType} onValueChange={setBikeType}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select bike type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="full">Full Suspension</SelectItem>
-                <SelectItem value="hardtail">Hardtail</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label>Rear Travel (mm)</Label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Slider
-                    value={[travel]}
-                    onValueChange={(value) => setTravel(value[0])}
-                    min={100}
-                    max={200}
-                    step={10}
-                    className="mt-2"
-                  />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Adjust rear travel in millimeters</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <div className="text-right text-sm text-muted-foreground mt-1">
-              {travel}mm
-            </div>
-          </div>
-
-          <div>
-            <Label>Preferred Feel</Label>
-            <Select value={preferredFeel} onValueChange={setPreferredFeel}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select preferred feel" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="soft">Soft</SelectItem>
-                <SelectItem value="balanced">Balanced</SelectItem>
-                <SelectItem value="firm">Firm</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label>Trail Conditions</Label>
-            <Select value={trailCondition} onValueChange={setTrailCondition}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select trail conditions" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="smooth">Smooth</SelectItem>
-                <SelectItem value="technical">Technical</SelectItem>
-                <SelectItem value="jumps">Jumps or Drops</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label>Priority</Label>
-            <Select value={priority} onValueChange={setPriority}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select priority" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="climbing">Climbing Efficiency</SelectItem>
-                <SelectItem value="descending">Descending Performance</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <ShockFormFields
+          ridingStyle={ridingStyle}
+          setRidingStyle={setRidingStyle}
+          bikeType={bikeType}
+          setBikeType={setBikeType}
+          travel={travel}
+          setTravel={setTravel}
+          preferredFeel={preferredFeel}
+          setPreferredFeel={setPreferredFeel}
+          trailCondition={trailCondition}
+          setTrailCondition={setTrailCondition}
+          priority={priority}
+          setPriority={setPriority}
+        />
 
         <ShockSettings settings={settings} />
 
