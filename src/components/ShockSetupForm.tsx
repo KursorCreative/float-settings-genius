@@ -1,233 +1,220 @@
-import React, { useState } from 'react';
-import { Card } from "@/components/ui/card";
+import React, { useState } from "react";
+import { WeightConverter } from "./WeightConverter";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { WeightConverter } from './WeightConverter';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Info, RotateCcw } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
-
-interface ShockSettings {
-  airPressure: number;
-  hsr: number;
-  lsr: number;
-  hsc: number;
-  lsc: number;
-}
+import { useToast } from "@/hooks/use-toast";
 
 export const ShockSetupForm = () => {
-  const [weight, setWeight] = useState(70);
-  const [unit, setUnit] = useState<'kg' | 'lbs'>('kg');
-  const [ridingStyle, setRidingStyle] = useState('trail');
-  const [bikeTravel, setBikeTravel] = useState('150');
-  const [preferredFeel, setPreferredFeel] = useState('balanced');
   const { toast } = useToast();
+  const [weight, setWeight] = useState(70);
+  const [unit, setUnit] = useState<"kg" | "lbs">("kg");
+  const [ridingStyle, setRidingStyle] = useState("trail");
+  const [bikeType, setBikeType] = useState("full");
+  const [travel, setTravel] = useState(150);
+  const [preferredFeel, setPreferredFeel] = useState("balanced");
+  const [trailCondition, setTrailCondition] = useState("technical");
+  const [priority, setPriority] = useState("descending");
 
-  const calculateSettings = (): ShockSettings => {
-    const weightInKg = unit === 'kg' ? weight : weight / 2.20462;
+  const calculateSettings = () => {
+    // Convert weight to kg if needed
+    const weightInKg = unit === "lbs" ? weight * 0.453592 : weight;
     
-    // Base pressure calculation (simplified for demo)
-    let pressure = weightInKg * 1.1;
-    
+    // Base calculations
+    let airPressure = weightInKg * 1.1; // Basic calculation - would need refinement
+    let hsr = 8;
+    let lsr = 10;
+    let hsc = 12;
+    let lsc = 14;
+
     // Adjust for riding style
-    switch(ridingStyle) {
-      case 'xc':
-        pressure *= 1.1;
-        break;
-      case 'enduro':
-        pressure *= 0.9;
-        break;
+    if (ridingStyle === "xc") {
+      airPressure *= 1.1;
+      hsr -= 2;
+      lsr -= 2;
+    } else if (ridingStyle === "enduro") {
+      airPressure *= 0.9;
+      hsc += 2;
+      lsc += 2;
     }
-    
+
     // Adjust for preferred feel
-    switch(preferredFeel) {
-      case 'soft':
-        pressure *= 0.95;
-        break;
-      case 'firm':
-        pressure *= 1.05;
-        break;
+    if (preferredFeel === "soft") {
+      airPressure *= 0.95;
+      hsc -= 1;
+      lsc -= 1;
+    } else if (preferredFeel === "firm") {
+      airPressure *= 1.05;
+      hsc += 1;
+      lsc += 1;
     }
 
     return {
-      airPressure: Math.round(pressure),
-      hsr: 8,  // Default values for demo
-      lsr: 10,
-      hsc: 12,
-      lsc: 14,
+      airPressure: Math.round(airPressure),
+      hsr,
+      lsr,
+      hsc,
+      lsc,
     };
-  };
-
-  const handleReset = () => {
-    setWeight(70);
-    setUnit('kg');
-    setRidingStyle('trail');
-    setBikeTravel('150');
-    setPreferredFeel('balanced');
-    toast({
-      title: "Settings Reset",
-      description: "All settings have been reset to default values.",
-    });
   };
 
   const settings = calculateSettings();
 
+  const handleReset = () => {
+    setWeight(70);
+    setUnit("kg");
+    setRidingStyle("trail");
+    setBikeType("full");
+    setTravel(150);
+    setPreferredFeel("balanced");
+    setTrailCondition("technical");
+    setPriority("descending");
+    
+    toast({
+      title: "Settings Reset",
+      description: "All values have been reset to defaults.",
+    });
+  };
+
   return (
-    <Card className="p-6 space-y-6 animate-fade-in">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Shock Settings</h2>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleReset}
-          className="flex items-center gap-2"
-          aria-label="Reset all settings to default values"
-        >
-          <RotateCcw className="h-4 w-4" />
-          Reset
-        </Button>
-      </div>
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle>Shock Setup Calculator</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <WeightConverter
+          weight={weight}
+          unit={unit}
+          onWeightChange={setWeight}
+          onUnitChange={setUnit}
+        />
 
-      <WeightConverter
-        weight={weight}
-        unit={unit}
-        onWeightChange={setWeight}
-        onUnitChange={setUnit}
-      />
+        <div className="space-y-4">
+          <div>
+            <Label>Riding Style</Label>
+            <Select value={ridingStyle} onValueChange={setRidingStyle}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select riding style" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="xc">Cross-Country (XC)</SelectItem>
+                <SelectItem value="trail">Trail</SelectItem>
+                <SelectItem value="flow">Flow Trails</SelectItem>
+                <SelectItem value="enduro">Enduro</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <Label htmlFor="riding-style">Riding Style</Label>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Info className="h-4 w-4 text-muted-foreground" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Choose your primary riding style for optimal settings</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        <RadioGroup
-          defaultValue="trail"
-          onValueChange={setRidingStyle}
-          className="flex flex-wrap gap-4"
-          aria-label="Select your riding style"
-        >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="xc" id="xc" />
-            <Label htmlFor="xc">XC</Label>
+          <div>
+            <Label>Bike Type</Label>
+            <Select value={bikeType} onValueChange={setBikeType}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select bike type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="full">Full Suspension</SelectItem>
+                <SelectItem value="hardtail">Hardtail</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="trail" id="trail" />
-            <Label htmlFor="trail">Trail</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="flow" id="flow" />
-            <Label htmlFor="flow">Flow</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="enduro" id="enduro" />
-            <Label htmlFor="enduro">Enduro</Label>
-          </div>
-        </RadioGroup>
-      </div>
 
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <Label htmlFor="bike-travel">Rear Travel (mm)</Label>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Info className="h-4 w-4 text-muted-foreground" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Your bike's rear suspension travel in millimeters</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        <Select 
-          defaultValue="150" 
-          onValueChange={setBikeTravel}
-          aria-label="Select rear suspension travel"
-        >
-          <SelectTrigger id="bike-travel">
-            <SelectValue placeholder="Select travel" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="130">130mm</SelectItem>
-            <SelectItem value="140">140mm</SelectItem>
-            <SelectItem value="150">150mm</SelectItem>
-            <SelectItem value="160">160mm</SelectItem>
-            <SelectItem value="170">170mm</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+          <div>
+            <Label>Rear Travel (mm)</Label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Slider
+                    value={[travel]}
+                    onValueChange={(value) => setTravel(value[0])}
+                    min={100}
+                    max={200}
+                    step={10}
+                    className="mt-2"
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Adjust rear travel in millimeters</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <div className="text-right text-sm text-muted-foreground mt-1">
+              {travel}mm
+            </div>
+          </div>
 
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <Label>Preferred Feel</Label>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Info className="h-4 w-4 text-muted-foreground" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Choose how you want your suspension to feel</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        <RadioGroup
-          defaultValue="balanced"
-          onValueChange={setPreferredFeel}
-          className="flex flex-wrap gap-4"
-          aria-label="Select your preferred suspension feel"
-        >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="soft" id="soft" />
-            <Label htmlFor="soft">Soft</Label>
+          <div>
+            <Label>Preferred Feel</Label>
+            <Select value={preferredFeel} onValueChange={setPreferredFeel}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select preferred feel" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="soft">Soft</SelectItem>
+                <SelectItem value="balanced">Balanced</SelectItem>
+                <SelectItem value="firm">Firm</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="balanced" id="balanced" />
-            <Label htmlFor="balanced">Balanced</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="firm" id="firm" />
-            <Label htmlFor="firm">Firm</Label>
-          </div>
-        </RadioGroup>
-      </div>
 
-      <div className="mt-6 p-4 bg-gray-50 rounded-lg dark:bg-gray-800 transition-all">
-        <h3 className="text-lg font-semibold mb-4">Recommended Settings</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-3 bg-white dark:bg-gray-700 rounded-lg transition-all hover:shadow-md">
-            <p className="text-sm text-gray-600 dark:text-gray-300">Air Pressure</p>
-            <p className="text-xl font-bold text-fox-orange">{settings.airPressure} PSI</p>
+          <div>
+            <Label>Trail Conditions</Label>
+            <Select value={trailCondition} onValueChange={setTrailCondition}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select trail conditions" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="smooth">Smooth</SelectItem>
+                <SelectItem value="technical">Technical</SelectItem>
+                <SelectItem value="jumps">Jumps or Drops</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div className="p-3 bg-white dark:bg-gray-700 rounded-lg transition-all hover:shadow-md">
-            <p className="text-sm text-gray-600 dark:text-gray-300">HSR</p>
-            <p className="text-xl font-bold">{settings.hsr} clicks</p>
-          </div>
-          <div className="p-3 bg-white dark:bg-gray-700 rounded-lg transition-all hover:shadow-md">
-            <p className="text-sm text-gray-600 dark:text-gray-300">LSR</p>
-            <p className="text-xl font-bold">{settings.lsr} clicks</p>
-          </div>
-          <div className="p-3 bg-white dark:bg-gray-700 rounded-lg transition-all hover:shadow-md">
-            <p className="text-sm text-gray-600 dark:text-gray-300">HSC</p>
-            <p className="text-xl font-bold">{settings.hsc} clicks</p>
-          </div>
-          <div className="p-3 bg-white dark:bg-gray-700 rounded-lg transition-all hover:shadow-md">
-            <p className="text-sm text-gray-600 dark:text-gray-300">LSC</p>
-            <p className="text-xl font-bold">{settings.lsc} clicks</p>
+
+          <div>
+            <Label>Priority</Label>
+            <Select value={priority} onValueChange={setPriority}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select priority" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="climbing">Climbing Efficiency</SelectItem>
+                <SelectItem value="descending">Descending Performance</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
-      </div>
+
+        <div className="mt-8 p-6 bg-muted rounded-lg">
+          <h3 className="text-lg font-semibold mb-4">Recommended Settings</h3>
+          <div className="space-y-2">
+            <p>Air Pressure: {settings.airPressure} PSI</p>
+            <p>High-Speed Rebound (HSR): {settings.hsr} clicks out</p>
+            <p>Low-Speed Rebound (LSR): {settings.lsr} clicks out</p>
+            <p>High-Speed Compression (HSC): {settings.hsc} clicks out</p>
+            <p>Low-Speed Compression (LSC): {settings.lsc} clicks out</p>
+          </div>
+        </div>
+
+        <div className="flex justify-end">
+          <Button variant="outline" onClick={handleReset}>
+            Reset to Defaults
+          </Button>
+        </div>
+      </CardContent>
     </Card>
   );
 };
