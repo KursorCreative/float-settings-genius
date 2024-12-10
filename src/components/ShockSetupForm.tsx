@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { ShockSettings } from "./ShockSettings";
 
 export const ShockSetupForm = () => {
   const { toast } = useToast();
@@ -198,16 +199,7 @@ export const ShockSetupForm = () => {
           </div>
         </div>
 
-        <div className="mt-8 p-6 bg-muted rounded-lg">
-          <h3 className="text-lg font-semibold mb-4">Recommended Settings</h3>
-          <div className="space-y-2">
-            <p>Air Pressure: {settings.airPressure} PSI</p>
-            <p>High-Speed Rebound (HSR): {settings.hsr} clicks out</p>
-            <p>Low-Speed Rebound (LSR): {settings.lsr} clicks out</p>
-            <p>High-Speed Compression (HSC): {settings.hsc} clicks out</p>
-            <p>Low-Speed Compression (LSC): {settings.lsc} clicks out</p>
-          </div>
-        </div>
+        <ShockSettings settings={settings} />
 
         <div className="flex justify-end">
           <Button variant="outline" onClick={handleReset}>
