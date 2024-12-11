@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ShockSettings } from "./ShockSettings";
 import { ShockFormFields } from "./ShockFormFields";
+import { SagCalculator } from "./SagCalculator";
 import { calculateShockSettings } from "@/utils/shockCalculations";
 import { Download } from "lucide-react";
 import jsPDF from "jspdf";
@@ -103,6 +104,12 @@ export const ShockSetupForm = () => {
           unit={unit}
           onWeightChange={setWeight}
           onUnitChange={setUnit}
+        />
+
+        <SagCalculator 
+          weight={weight}
+          unit={unit}
+          ridingStyle={ridingStyle}
         />
 
         <ShockFormFields
