@@ -38,124 +38,142 @@ const calculateGeometryChanges = (forkTravel: string) => {
   }
 };
 
+const calculateAirPressure = (weightKg: number, ridingStyle: string): number => {
+  // Base multiplier (K) varies by riding style
+  let k = 2.8; // Default for trail riding
+  
+  switch (ridingStyle) {
+    case "flow":
+      k = 3.0; // Firmer for jumps and drops
+      break;
+    case "technical":
+      k = 2.5; // Softer for technical terrain
+      break;
+    default: // trail
+      k = 2.8;
+  }
+  
+  return Math.round(weightKg * k);
+};
+
+const calculateCompressionSettings = (weightKg: number, ridingStyle: string) => {
+  // Base values
+  const baseLSC = 12;
+  const baseHSC = 8;
+  
+  // Calculate LSC and HSC using weight-based formulas
+  let lsc = Math.round(baseLSC - (weightKg / 10));
+  let hsc = Math.round(baseHSC - (weightKg / 15));
+  
+  // Adjust for riding style
+  switch (ridingStyle) {
+    case "flow":
+      lsc -= 2; // Firmer for better pump and jump support
+      hsc -= 1;
+      break;
+    case "technical":
+      lsc += 2; // Softer for better small bump compliance
+      hsc += 1;
+      break;
+  }
+  
+  // Ensure values stay within valid range (0-16)
+  return {
+    lsc: Math.max(0, Math.min(16, lsc)),
+    hsc: Math.max(0, Math.min(16, hsc))
+  };
+};
+
+const calculateReboundSettings = (airPressure: number, ridingStyle: string) => {
+  // Base values
+  const baseLSR = 10;
+  const baseHSR = 3;
+  
+  // Calculate using air pressure-based formulas
+  let lsr = Math.round(baseLSR + (airPressure / 40));
+  let hsr = Math.round(baseHSR + (airPressure / 60));
+  
+  // Adjust for riding style
+  switch (ridingStyle) {
+    case "flow":
+      lsr -= 1; // Faster rebound for better pop
+      hsr -= 1;
+      break;
+    case "technical":
+      lsr += 1; // Slower rebound for better control
+      hsr += 1;
+      break;
+  }
+  
+  // Ensure values stay within valid range (0-16)
+  return {
+    lsr: Math.max(0, Math.min(16, lsr)),
+    hsr: Math.max(0, Math.min(16, hsr))
+  };
+};
+
+const calculateForkSettings = (shockSettings: Partial<ShockSettings>, ridingStyle: string) => {
+  // Fork settings are typically 1-2 clicks softer than shock for better front-end sensitivity
+  return {
+    forkAirPressure: Math.round(shockSettings.airPressure! * 0.9),
+    forkHsr: Math.max(0, (shockSettings.hsr! - 1)),
+    forkLsr: Math.max(0, (shockSettings.lsr! - 1)),
+    forkHsc: Math.max(0, (shockSettings.hsc! - 2)),
+    forkLsc: Math.max(0, (shockSettings.lsc! - 2))
+  };
+};
+
 export const calculateShockSettings = (
   weight: number,
   unit: "kg" | "lbs",
   ridingStyle: string,
   preferredFeel: string,
   frameSize: string,
-  forkTravel: string = "150" // Default to 150mm
+  forkTravel: string = "150"
 ): ShockSettings => {
   // Convert weight to kg if needed
   const weightInKg = unit === "lbs" ? weight * 0.453592 : weight;
   
-  // Base calculations for Trek EXE (Horst Link suspension)
-  let airPressure = weightInKg * 1.2;
-  let hsr = 8;
-  let lsr = 10;
-  let hsc = 12;
-  let lsc = 14;
-
-  // Fork base calculations
-  let forkAirPressure = weightInKg * 0.9;
-  let forkHsr = 7;
-  let forkLsr = 9;
-  let forkHsc = 11;
-  let forkLsc = 13;
-
-  // Calculate geometry changes based on fork travel
-  const geometryChanges = calculateGeometryChanges(forkTravel);
-  const stackHeight = 630 + geometryChanges.stackHeightDiff; // Base stack height + difference
-  const headAngle = 65.5 + geometryChanges.headAngleDiff; // Base head angle + difference
-
-  // Adjust fork settings based on travel
-  if (forkTravel === "160") {
-    forkAirPressure *= 1.05; // Slightly higher pressure for longer travel
-    forkHsc += 1; // More high-speed compression for bigger hits
-  } else if (forkTravel === "140") {
-    forkAirPressure *= 0.95; // Slightly lower pressure for shorter travel
-    forkLsc -= 1; // Less low-speed compression for better small bump sensitivity
-  }
-
-  switch (frameSize) {
-    case "XL":
-      hsr += 1;
-      lsr += 1;
-      forkHsr += 1;
-      forkLsr += 1;
-      break;
-    case "L":
-      hsr += 0.5;
-      lsr += 0.5;
-      forkHsr += 0.5;
-      forkLsr += 0.5;
-      break;
-    case "S":
-      hsr -= 0.5;
-      lsr -= 0.5;
-      forkHsr -= 0.5;
-      forkLsr -= 0.5;
-      break;
-  }
-
-  // Adjust for riding style
-  switch (ridingStyle) {
-    case "trail":
-      hsr += 1;
-      lsc += 1;
-      forkHsr += 1;
-      forkLsc += 1;
-      break;
-    case "flow":
-      airPressure *= 1.05;
-      forkAirPressure *= 1.05;
-      hsr -= 1;
-      forkHsr -= 1;
-      hsc += 2;
-      forkHsc += 2;
-      break;
-    case "technical":
-      airPressure *= 0.95;
-      forkAirPressure *= 0.95;
-      lsc -= 2;
-      forkLsc -= 2;
-      lsr += 1;
-      forkLsr += 1;
-      break;
-  }
-
+  // Calculate base air pressure
+  let airPressure = calculateAirPressure(weightInKg, ridingStyle);
+  
+  // Calculate compression and rebound settings
+  const compressionSettings = calculateCompressionSettings(weightInKg, ridingStyle);
+  const reboundSettings = calculateReboundSettings(airPressure, ridingStyle);
+  
   // Adjust for preferred feel
-  switch (preferredFeel) {
-    case "soft":
-      airPressure *= 0.95;
-      forkAirPressure *= 0.95;
-      hsc -= 2;
-      forkHsc -= 2;
-      lsc -= 2;
-      forkLsc -= 2;
-      break;
-    case "firm":
-      airPressure *= 1.05;
-      forkAirPressure *= 1.05;
-      hsc += 2;
-      forkHsc += 2;
-      lsc += 2;
-      forkLsc += 2;
-      break;
+  if (preferredFeel === "soft") {
+    airPressure = Math.round(airPressure * 0.95);
+    compressionSettings.lsc = Math.max(0, compressionSettings.lsc - 2);
+    compressionSettings.hsc = Math.max(0, compressionSettings.hsc - 2);
+  } else if (preferredFeel === "firm") {
+    airPressure = Math.round(airPressure * 1.05);
+    compressionSettings.lsc = Math.min(16, compressionSettings.lsc + 2);
+    compressionSettings.hsc = Math.min(16, compressionSettings.hsc + 2);
   }
-
-  return {
-    airPressure: Math.round(airPressure),
-    hsr: Math.max(0, Math.min(Math.round(hsr), 16)),
-    lsr: Math.max(0, Math.min(Math.round(lsr), 16)),
-    hsc: Math.max(0, Math.min(Math.round(hsc), 16)),
-    lsc: Math.max(0, Math.min(Math.round(lsc), 16)),
-    forkAirPressure: Math.round(forkAirPressure),
-    forkHsr: Math.max(0, Math.min(Math.round(forkHsr), 16)),
-    forkLsr: Math.max(0, Math.min(Math.round(forkLsr), 16)),
-    forkHsc: Math.max(0, Math.min(Math.round(forkHsc), 16)),
-    forkLsc: Math.max(0, Math.min(Math.round(forkLsc), 16)),
+  
+  // Calculate geometry changes
+  const geometryChanges = calculateGeometryChanges(forkTravel);
+  const stackHeight = 630 + geometryChanges.stackHeightDiff;
+  const headAngle = 65.5 + geometryChanges.headAngleDiff;
+  
+  // Create base shock settings
+  const baseSettings: ShockSettings = {
+    airPressure,
+    hsr: reboundSettings.hsr,
+    lsr: reboundSettings.lsr,
+    hsc: compressionSettings.hsc,
+    lsc: compressionSettings.lsc,
     stackHeight,
     headAngle,
+    ...calculateForkSettings({
+      airPressure,
+      hsr: reboundSettings.hsr,
+      lsr: reboundSettings.lsr,
+      hsc: compressionSettings.hsc,
+      lsc: compressionSettings.lsc
+    }, ridingStyle)
   };
+  
+  return baseSettings;
 };
