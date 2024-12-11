@@ -1,13 +1,7 @@
-import { cn } from "@/lib/utils";
-import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { InfoIcon } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
+import { GeometrySection } from "./shock-settings/GeometrySection";
+import { SettingsSection } from "./shock-settings/SettingsSection";
+import { TipsSection } from "./shock-settings/TipsSection";
 
 interface ShockSettingsProps {
   settings: {
@@ -128,103 +122,22 @@ export const ShockSettings = ({ settings }: ShockSettingsProps) => {
         <Badge variant="secondary">Base Setup</Badge>
       </div>
       
-      <div>
-        <h4 className="text-md font-medium mb-4">Geometry Changes</h4>
-        <div className="grid gap-4 md:grid-cols-2">
-          <Card className="p-4 transition-all hover:shadow-md">
-            <div className="flex items-start justify-between">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Stack Height</p>
-                <p className="text-2xl font-semibold text-fox-orange">
-                  {settings.stackHeight}mm
-                </p>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-4 transition-all hover:shadow-md">
-            <div className="flex items-start justify-between">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Head Tube Angle</p>
-                <p className="text-2xl font-semibold text-fox-orange">
-                  {settings.headAngle.toFixed(1)}°
-                </p>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </div>
+      <GeometrySection 
+        stackHeight={settings.stackHeight}
+        headAngle={settings.headAngle}
+      />
 
-      <div>
-        <h4 className="text-md font-medium mb-4">Rear Shock Settings</h4>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {shockItems.map((item) => (
-            <Card key={item.label} className="p-4 transition-all hover:shadow-md">
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm text-muted-foreground">{item.label}</p>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <InfoIcon className="h-4 w-4 text-muted-foreground" />
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-[300px] space-y-2 p-4">
-                          <p className="font-medium">{item.tooltip.main}</p>
-                          <p className="text-sm text-muted-foreground">{item.tooltip.instruction}</p>
-                          {item.tooltip.direction && (
-                            <p className="text-sm text-muted-foreground whitespace-pre-line">{item.tooltip.direction}</p>
-                          )}
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                  <p className="text-2xl font-semibold text-fox-orange">{item.value}</p>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
+      <SettingsSection 
+        title="Rear Shock Settings"
+        items={shockItems}
+      />
       
-      <div>
-        <h4 className="text-md font-medium mb-4">Fox 36 Factory Fork Settings</h4>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {forkItems.map((item) => (
-            <Card key={item.label} className="p-4 transition-all hover:shadow-md">
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm text-muted-foreground">{item.label}</p>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <InfoIcon className="h-4 w-4 text-muted-foreground" />
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-[300px] space-y-2 p-4">
-                          <p className="font-medium">{item.tooltip.main}</p>
-                          <p className="text-sm text-muted-foreground">{item.tooltip.instruction}</p>
-                          {item.tooltip.direction && (
-                            <p className="text-sm text-muted-foreground whitespace-pre-line">{item.tooltip.direction}</p>
-                          )}
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                  <p className="text-2xl font-semibold text-fox-orange">{item.value}</p>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
+      <SettingsSection 
+        title="Fox 36 Factory Fork Settings"
+        items={forkItems}
+      />
       
-      <div className="rounded-lg border border-border bg-card p-4">
-        <p className="text-sm text-muted-foreground">
-          💡 Pro tip: Start with these settings and adjust based on feel. For rocky terrain,
-          try decreasing LSC by 1-2 clicks. For smoother trails, you can increase HSR
-          slightly for more pop. Ensure fork and shock settings complement each other for balanced performance.
-        </p>
-      </div>
+      <TipsSection />
     </div>
   );
 };
