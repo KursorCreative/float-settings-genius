@@ -2,7 +2,7 @@ import { Badge } from "./ui/badge";
 import { GeometrySection } from "./shock-settings/GeometrySection";
 import { SettingsSection } from "./shock-settings/SettingsSection";
 import { TipsSection } from "./shock-settings/TipsSection";
-import { useEffect, useRef, useCallback } from "react";
+import { useResizeObserver } from "@/hooks/useResizeObserver";
 
 interface ShockSettingsProps {
   settings: {
@@ -22,32 +22,7 @@ interface ShockSettingsProps {
 }
 
 export const ShockSettings = ({ settings }: ShockSettingsProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Throttle resize handler
-  const handleResize = useCallback((entries: ResizeObserverEntry[]) => {
-    if (!entries.length) return;
-    
-    // Handle resize if needed
-    // Currently we're just observing, but you can add specific resize handling here
-  }, []);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const observer = new ResizeObserver((entries) => {
-      // Use requestAnimationFrame to batch resize notifications
-      window.requestAnimationFrame(() => {
-        handleResize(entries);
-      });
-    });
-
-    observer.observe(containerRef.current);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [handleResize]);
+  const containerRef = useResizeObserver();
 
   const shockItems = [
     {
