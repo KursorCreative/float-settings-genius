@@ -56,26 +56,34 @@ const calculateAirPressure = (weightKg: number, ridingStyle: string): number => 
   return Math.round(weightKg * k);
 };
 
-const calculateCompressionSettings = (weightKg: number, ridingStyle: string) => {
-  // Base values for shock compression
+const calculateCompressionSettings = (weightKg: number, ridingStyle: string, preferredFeel: string) => {
+  // Base values for shock compression (Fox recommended)
   const baseLSC = 12;
   const baseHSC = 8;
   
-  // Calculate LSC and HSC using weight-based formulas
+  // Calculate initial LSC and HSC based on weight
   let lsc = Math.round(baseLSC - (weightKg / 10));
   let hsc = Math.round(baseHSC - (weightKg / 15));
   
-  // Adjust for riding style
-  switch (ridingStyle) {
-    case "flow":
-      lsc = Math.max(2, lsc - 2); // Firmer for better pump and jump support
-      hsc = Math.max(2, hsc - 1);
-      break;
-    case "technical":
-      lsc = Math.min(14, lsc + 2); // Softer for better small bump compliance
-      hsc = Math.min(14, hsc + 1);
-      break;
-  }
+  // Riding style adjustments
+  const styleAdjustments = {
+    "trail": 0,
+    "flow": -2,
+    "technical": 2
+  };
+  
+  // Feel adjustments
+  const feelAdjustments = {
+    "balanced": 0,
+    "soft": 1,
+    "firm": -1
+  };
+  
+  // Apply adjustments
+  lsc += (styleAdjustments[ridingStyle] || 0);
+  hsc += (styleAdjustments[ridingStyle] || 0);
+  lsc += (feelAdjustments[preferredFeel] || 0);
+  hsc += (feelAdjustments[preferredFeel] || 0);
   
   // Ensure values stay within valid range (2-14 clicks)
   return {
@@ -114,7 +122,7 @@ const calculateReboundSettings = (airPressure: number, ridingStyle: string) => {
 
 const calculateForkSettings = (shockSettings: Partial<ShockSettings>, ridingStyle: string) => {
   // Fork compression settings are typically 1-2 clicks softer than shock
-  const forkLSC = Math.max(2, shockSettings.lsc! - 2);
+  const forkLSC = Math.max(2, shockSettings.lsc! - 1);
   const forkHSC = Math.max(2, shockSettings.hsc! - 1);
   
   return {
@@ -141,19 +149,8 @@ export const calculateShockSettings = (
   let airPressure = calculateAirPressure(weightInKg, ridingStyle);
   
   // Calculate compression and rebound settings
-  const compressionSettings = calculateCompressionSettings(weightInKg, ridingStyle);
+  const compressionSettings = calculateCompressionSettings(weightInKg, ridingStyle, preferredFeel);
   const reboundSettings = calculateReboundSettings(airPressure, ridingStyle);
-  
-  // Adjust for preferred feel
-  if (preferredFeel === "soft") {
-    airPressure = Math.round(airPressure * 0.95);
-    compressionSettings.lsc = Math.max(2, compressionSettings.lsc - 2);
-    compressionSettings.hsc = Math.max(2, compressionSettings.hsc - 1);
-  } else if (preferredFeel === "firm") {
-    airPressure = Math.round(airPressure * 1.05);
-    compressionSettings.lsc = Math.min(14, compressionSettings.lsc + 2);
-    compressionSettings.hsc = Math.min(14, compressionSettings.hsc + 1);
-  }
   
   // Calculate geometry changes
   const geometryChanges = calculateGeometryChanges(forkTravel);
