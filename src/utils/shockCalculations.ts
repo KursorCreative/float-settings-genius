@@ -57,7 +57,7 @@ const calculateAirPressure = (weightKg: number, ridingStyle: string): number => 
 };
 
 const calculateCompressionSettings = (weightKg: number, ridingStyle: string) => {
-  // Base values
+  // Base values for shock compression
   const baseLSC = 12;
   const baseHSC = 8;
   
@@ -68,19 +68,19 @@ const calculateCompressionSettings = (weightKg: number, ridingStyle: string) => 
   // Adjust for riding style
   switch (ridingStyle) {
     case "flow":
-      lsc -= 2; // Firmer for better pump and jump support
-      hsc -= 1;
+      lsc = Math.max(2, lsc - 2); // Firmer for better pump and jump support
+      hsc = Math.max(2, hsc - 1);
       break;
     case "technical":
-      lsc += 2; // Softer for better small bump compliance
-      hsc += 1;
+      lsc = Math.min(14, lsc + 2); // Softer for better small bump compliance
+      hsc = Math.min(14, hsc + 1);
       break;
   }
   
-  // Ensure values stay within valid range (0-16)
+  // Ensure values stay within valid range (2-14 clicks)
   return {
-    lsc: Math.max(0, Math.min(16, lsc)),
-    hsc: Math.max(0, Math.min(16, hsc))
+    lsc: Math.max(2, Math.min(14, lsc)),
+    hsc: Math.max(2, Math.min(14, hsc))
   };
 };
 
@@ -113,13 +113,16 @@ const calculateReboundSettings = (airPressure: number, ridingStyle: string) => {
 };
 
 const calculateForkSettings = (shockSettings: Partial<ShockSettings>, ridingStyle: string) => {
-  // Fork settings are typically 1-2 clicks softer than shock for better front-end sensitivity
+  // Fork compression settings are typically 1-2 clicks softer than shock
+  const forkLSC = Math.max(2, shockSettings.lsc! - 2);
+  const forkHSC = Math.max(2, shockSettings.hsc! - 1);
+  
   return {
     forkAirPressure: Math.round(shockSettings.airPressure! * 0.9),
-    forkHsr: Math.max(0, (shockSettings.hsr! - 1)),
-    forkLsr: Math.max(0, (shockSettings.lsr! - 1)),
-    forkHsc: Math.max(0, (shockSettings.hsc! - 2)),
-    forkLsc: Math.max(0, (shockSettings.lsc! - 2))
+    forkHsr: Math.max(2, (shockSettings.hsr! - 1)),
+    forkLsr: Math.max(2, (shockSettings.lsr! - 1)),
+    forkHsc: forkHSC,
+    forkLsc: forkLSC
   };
 };
 
@@ -144,12 +147,12 @@ export const calculateShockSettings = (
   // Adjust for preferred feel
   if (preferredFeel === "soft") {
     airPressure = Math.round(airPressure * 0.95);
-    compressionSettings.lsc = Math.max(0, compressionSettings.lsc - 2);
-    compressionSettings.hsc = Math.max(0, compressionSettings.hsc - 2);
+    compressionSettings.lsc = Math.max(2, compressionSettings.lsc - 2);
+    compressionSettings.hsc = Math.max(2, compressionSettings.hsc - 1);
   } else if (preferredFeel === "firm") {
     airPressure = Math.round(airPressure * 1.05);
-    compressionSettings.lsc = Math.min(16, compressionSettings.lsc + 2);
-    compressionSettings.hsc = Math.min(16, compressionSettings.hsc + 2);
+    compressionSettings.lsc = Math.min(14, compressionSettings.lsc + 2);
+    compressionSettings.hsc = Math.min(14, compressionSettings.hsc + 1);
   }
   
   // Calculate geometry changes
