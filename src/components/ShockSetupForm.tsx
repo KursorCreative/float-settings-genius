@@ -9,6 +9,7 @@ import { SagCalculator } from "./SagCalculator";
 import { calculateShockSettings } from "@/utils/shockCalculations";
 import { Download } from "lucide-react";
 import jsPDF from "jspdf";
+import { SpacerRecommendation } from "./SpacerRecommendation";
 
 export const ShockSetupForm = () => {
   const { toast } = useToast();
@@ -132,6 +133,13 @@ export const ShockSetupForm = () => {
         />
 
         <ShockSettings settings={settings} />
+
+        <SpacerRecommendation
+          weight={weight}
+          unit={unit}
+          ridingStyle={ridingStyle}
+          preferredFeel={preferredFeel}
+        />
 
         <div className="flex justify-end gap-4">
           <Button variant="outline" onClick={handleReset}>
