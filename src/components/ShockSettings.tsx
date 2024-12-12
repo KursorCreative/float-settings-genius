@@ -2,6 +2,7 @@ import { Badge } from "./ui/badge";
 import { GeometrySection } from "./shock-settings/GeometrySection";
 import { SettingsSection } from "./shock-settings/SettingsSection";
 import { TipsSection } from "./shock-settings/TipsSection";
+import { useEffect, useRef } from "react";
 
 interface ShockSettingsProps {
   settings: {
@@ -21,6 +22,39 @@ interface ShockSettingsProps {
 }
 
 export const ShockSettings = ({ settings }: ShockSettingsProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Debounce resize observations
+    let rafId: number;
+    const resizeObserver = new ResizeObserver((entries) => {
+      // Cancel any pending observations
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
+      
+      // Schedule the next update
+      rafId = requestAnimationFrame(() => {
+        for (const entry of entries) {
+          if (entry.target === containerRef.current) {
+            // Handle resize if needed
+          }
+        }
+      });
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
+      resizeObserver.disconnect();
+    };
+  }, []);
+
   const shockItems = [
     {
       label: "Shock Air Pressure",
@@ -116,7 +150,7 @@ export const ShockSettings = ({ settings }: ShockSettingsProps) => {
   ];
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div ref={containerRef} className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Recommended Settings</h3>
         <Badge variant="secondary">Base Setup</Badge>
