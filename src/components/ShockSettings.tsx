@@ -2,7 +2,7 @@ import { Badge } from "./ui/badge";
 import { GeometrySection } from "./shock-settings/GeometrySection";
 import { SettingsSection } from "./shock-settings/SettingsSection";
 import { TipsSection } from "./shock-settings/TipsSection";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
 interface ShockSettingsProps {
   settings: {
@@ -24,36 +24,30 @@ interface ShockSettingsProps {
 export const ShockSettings = ({ settings }: ShockSettingsProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Throttle resize handler
+  const handleResize = useCallback((entries: ResizeObserverEntry[]) => {
+    if (!entries.length) return;
+    
+    // Handle resize if needed
+    // Currently we're just observing, but you can add specific resize handling here
+  }, []);
+
   useEffect(() => {
-    // Debounce resize observations
-    let rafId: number;
-    const resizeObserver = new ResizeObserver((entries) => {
-      // Cancel any pending observations
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-      }
-      
-      // Schedule the next update
-      rafId = requestAnimationFrame(() => {
-        for (const entry of entries) {
-          if (entry.target === containerRef.current) {
-            // Handle resize if needed
-          }
-        }
+    if (!containerRef.current) return;
+
+    const observer = new ResizeObserver((entries) => {
+      // Use requestAnimationFrame to batch resize notifications
+      window.requestAnimationFrame(() => {
+        handleResize(entries);
       });
     });
 
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
-    }
+    observer.observe(containerRef.current);
 
     return () => {
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-      }
-      resizeObserver.disconnect();
+      observer.disconnect();
     };
-  }, []);
+  }, [handleResize]);
 
   const shockItems = [
     {
