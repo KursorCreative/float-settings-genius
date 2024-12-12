@@ -1,5 +1,11 @@
 import { ShockSetupForm } from "@/components/ShockSetupForm";
-import { Bike, Sparkles } from "lucide-react";
+import { Bike, Sparkles, Info } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Index = () => {
   return (
@@ -26,12 +32,34 @@ const Index = () => {
           <p>All recommendations are starting points. Fine-tune based on your feel and preferences.</p>
         </div>
 
-        <footer className="mt-16 text-center text-gray-500 dark:text-gray-400 flex flex-col items-center justify-center gap-1">
+        <footer className="mt-16 text-center text-gray-500 dark:text-gray-400 flex flex-col items-center justify-center gap-2">
           <div className="flex items-center gap-2">
             <span>Developed by Matt Pirani</span>
             <Bike className="inline-block w-5 h-5 text-fox-orange" />
           </div>
-          <span className="text-sm">© 2024</span>
+          <div className="flex items-center gap-2 text-sm">
+            <span>© 2024</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="flex items-center gap-1">
+                    <Info className="w-4 h-4" />
+                    <span>v1.2.0</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="space-y-2">
+                    <p className="font-medium">Latest Updates:</p>
+                    <ul className="text-xs list-disc pl-4 space-y-1">
+                      <li>Dynamic LSC/HSC calculations</li>
+                      <li>Improved fork settings</li>
+                      <li>Enhanced UI responsiveness</li>
+                    </ul>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </footer>
       </div>
     </div>
